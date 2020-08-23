@@ -7,8 +7,10 @@ import random
 
 gravedad = 0.25
 alturasPipe = [400, 500, 800]
-activo = True
+activo = False
 
+
+################################### PISO ######################################################################
 class Piso():
 
 	def __init__(self, pantalla):
@@ -28,8 +30,7 @@ class Piso():
 		if self.posicionPisoX <= -576:
 			self.posicionPisoX = 0
 
-
-
+################################### BIRD ######################################################################
 class Bird():
 
 	def __init__(self, pantalla):
@@ -68,8 +69,7 @@ class Bird():
 
 
 
-
-
+################################### PIPE ######################################################################
 class Pipe():
 
 	def __init__(self, pantalla):
@@ -100,14 +100,55 @@ class Pipe():
 
 
 
+################################### SCORE ######################################################################
+class Score():
+
+	def __init__(self, pantalla, highScore):
+
+		self.score = 0
+		self.highScore = highScore
+		self.font = pygame.font.Font("04B_19.TTF", 30)
+		self.pantalla = pantalla
+
+	def dibujar(self, estado):
+
+		if estado:
+			surfaceScore = self.font.render(str(int(self.score)), True, (255, 255, 255))
+
+		else:
+			surfaceScore = self.font.render("High Score: " + str(int(self.highScore)), True, (255, 255, 255))
+			
+		rect = surfaceScore.get_rect(center = (288, 100))
+		self.pantalla.blit(surfaceScore, rect)
+
+	def update(self):
+
+		self.score += 0.01
+		if self.score > self.highScore:
+			self.highScore = self.score
+
+		return self.highScore
+
+
+################################################################################################################
+
 def main():
 
 	pygame.init()
+	pygame.display.set_caption("Flappy Bird")
+
 	pantalla = pygame.display.set_mode((576, 1024))
 	clock = pygame.time.Clock()
+	
+	highScore = 0
+	score = Score(pantalla, highScore)
 
 	fondo = pygame.image.load("assets/background-day.png").convert()
 	fondo = pygame.transform.scale2x(fondo)
+
+	gameOverFondo = pygame.image.load("assets/message.png")
+	gameOverFondo = pygame.transform.scale2x(gameOverFondo)
+	gameOverRect = gameOverFondo.get_rect(center = (288, 500))
 
 
 
@@ -138,6 +179,7 @@ def main():
 					activo = True
 					listaPipes.clear()
 					bird = Bird(pantalla)
+					score = Score(pantalla, highScore)
 
 			if event.type == PipeSpawner:
 				listaPipes.append(Pipe(pantalla))
@@ -155,8 +197,12 @@ def main():
 				pipe.dibujar()
 
 			bird.dibujar()
+			highScore = score.update()
 
+		else:
+			pantalla.blit(gameOverFondo, gameOverRect)
 
+		score.dibujar(activo)
 		
 
 		pygame.display.update()
