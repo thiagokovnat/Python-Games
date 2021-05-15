@@ -56,7 +56,7 @@ class Bird():
 	def saltar(self):
 
 		self.movimiento = 0
-		self.movimiento -= 12 
+		self.movimiento -= 10 
 
 	def colision(self, pipeList):
 
